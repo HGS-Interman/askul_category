@@ -1,4 +1,4 @@
-from askul_category import __version__
+from askul_item import __version__
 
 
 def test_version() -> None:
