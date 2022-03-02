@@ -45,7 +45,7 @@ def get_item_info(product_code:str)->Dict[str, str]:
     item_info["price_num"] = html.xpath('//p[@class="priceNum"]/span[@class="num"]')[0].text.replace("￥","").replace(",","")
     item_info["price_tax"] = html.xpath('//p[@class="priceNum"]/span[@class="tax"]')[0].text.replace("￥","").replace(",","")
     item_info["item_name"] = html.xpath('//h1[@class="productTitle wrongInformationModalTarget-name"]')[0].text.strip().replace("\u3000"," ")
-    item_info["item_format"] =  html.xpath('//span[@class="format"]/span')[0].attrib.get("content", "")
+    item_info["item_format"] =  html.xpath('//span[@class="format"]/span')[0].attrib["content"] if len(html.xpath('//span[@class="format"]/span')) > 0 else ""
     item_info["item_jancode"] =  html.xpath('//span[@class="janCode"]')[0].text.split("：")[1]
 
     return item_info
