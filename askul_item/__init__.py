@@ -2,12 +2,13 @@ from email import header
 from pathlib import Path
 import requests
 import lxml.html
+from typing import Dict
 from single_source import get_version
 
 __version__ = get_version(__name__, Path(__file__).parent.parent)
 
 
-def get_item_info(product_code:str)->dict[str, str]:
+def get_item_info(product_code:str)->Dict[str, str]:
     """
     アスクルのページから商品情報を取得する
     
@@ -44,12 +45,13 @@ def get_item_info(product_code:str)->dict[str, str]:
     item_info["price_num"] = html.xpath('//p[@class="priceNum"]/span[@class="num"]')[0].text.replace("￥","").replace(",","")
     item_info["price_tax"] = html.xpath('//p[@class="priceNum"]/span[@class="tax"]')[0].text.replace("￥","").replace(",","")
     item_info["item_name"] = html.xpath('//h1[@class="productTitle wrongInformationModalTarget-name"]')[0].text.strip().replace("\u3000"," ")
-    item_info["item_format"] =  html.xpath('//span[@class="format"]/span')[0].attrib["content"]
+    item_info["item_format"] =  html.xpath('//span[@class="format"]/span')[0].attrib.get("content", "")
     item_info["item_jancode"] =  html.xpath('//span[@class="janCode"]')[0].text.split("：")[1]
 
     return item_info
 
 
-# if __name__ == "__main__":
-#     item = get_item_info("641131")
-#     print(item)
+if __name__ == "__main__":
+    import pdb; pdb.set_trace()
+    item = get_item_info("688881")
+    print(item)
