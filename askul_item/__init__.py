@@ -4,12 +4,14 @@ import requests
 import lxml.html
 from typing import Dict
 from single_source import get_version
+import time
 
 __version__ = get_version(__name__, Path(__file__).parent.parent)
 
 # 医療機関であるかの確認画面に遷移する対策
 __session__ = requests.session() 
-__session__.post("https://www.askul.co.jp/ctg/medical/medicalConfirm/clickYes", data = {'backUrl': '/p/1596710/'})
+__session__.post("https://www.askul.co.jp/ctg/medical/medicalConfirm/clickYes", data = {'backUrl': '/'})
+
 
 def get_item_info(product_code:str)->Dict[str, str]:
     """
@@ -22,17 +24,20 @@ def get_item_info(product_code:str)->Dict[str, str]:
         dict: 商品情報
     """
     item_url = "https://www.askul.co.jp/p/" + product_code + "/"
+    item_info = {"product_code": product_code}
+    item_info["error_message"] = ""
+    item_info["success"] = False
+
     for i in range(3):
         try:
-            res = __session__.get(item_url, timeout=5)
+            res = __session__.get(item_url, timeout=15)
 
             html = lxml.html.fromstring(res.text)
-            item_info = {"product_code": product_code}
 
             # 取扱中止等のエラーがある場合は商品名にエラーメッセージを入れて終了
             if len(html.xpath('//div[@class="errorMessageInner"]'))>0:
                 item_info["item_name"] = html.xpath('//div[@class="errorMessageInner"]')[0].text_content().strip()
-                item_info["success"] = False
+                item_info["error_message"] = item_info["item_name"]
                 return item_info
             
             head_breadcrumbs = html.xpath('//div[@class="breadcrumbs"]')[0]
@@ -60,12 +65,13 @@ def get_item_info(product_code:str)->Dict[str, str]:
             return item_info
 
         except Exception as e:
-            print(e)
-            pass
+            item_info["error_message"] = f"{e}"
+            time.sleep(2)
+
     else:
-        raise TimeoutError()
+        return item_info
 
 
 if __name__ == "__main__":
-    item = get_item_info("8210846")
+    item = get_item_info("126432")
     print(item)
