@@ -30,7 +30,7 @@ def get_item_info(product_code:str)->Dict[str, str]:
 
     for i in range(3):
         try:
-            res = __session__.get(item_url, timeout=15)
+            res = __session__.get(item_url, timeout=10)
 
             html = lxml.html.fromstring(res.text)
 
