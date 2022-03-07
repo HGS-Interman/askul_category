@@ -51,11 +51,12 @@ def get_item_info(product_code:str)->Dict[str, str]:
             for i in range(len(img_elms)):
                 item_info["img_url_" + str(i)] ="https:" + img_elms[i].attrib["src"]
             
-            if len(html.xpath('//span[@class="price"]/span[@class="num"]')) > 0:
-                item_info["price_tax"] = html.xpath('//span[@class="price"]/span[@class="num"]')[0].text.replace("￥","").replace(",","")
-            else:
+            try:
                 item_info["price_num"] = html.xpath('//p[@class="priceNum"]/span[@class="num"]')[0].text.replace("￥","").replace(",","") if len( html.xpath('//p[@class="priceNum"]/span[@class="num"]')) > 0 else ""
                 item_info["price_tax"] = html.xpath('//p[@class="priceNum"]/span[@class="tax"]')[0].text.replace("￥","").replace(",","") if len( html.xpath('//p[@class="priceNum"]/span[@class="tax"]')) > 0 else ""
+            except:
+                item_info["price_num"] = "-"
+                item_info["price_tax"] = "-"
 
             item_info["item_name"] = html.xpath('//h1[@class="productTitle wrongInformationModalTarget-name"]')[0].text.strip().replace("\u3000"," ")
             item_info["item_format"] =  html.xpath('//span[@class="format"]/span')[0].attrib["content"] if len(html.xpath('//span[@class="format"]/span')) > 0 else ""
@@ -73,5 +74,5 @@ def get_item_info(product_code:str)->Dict[str, str]:
 
 
 if __name__ == "__main__":
-    item = get_item_info("126432")
+    item = get_item_info("5259253")
     print(item)
